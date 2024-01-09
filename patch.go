@@ -373,6 +373,14 @@ func (s *Splice) Get(index int) (byte, error) {
 	return (*s.slices[position.slice])[position.offset], nil
 }
 
+func (s *Splice) GetUnsafe(index int) byte {
+	position, err := s.getPosition(index)
+	if err != nil {
+		panic(1)
+	}
+	return (*s.slices[position.slice])[position.offset]
+}
+
 func (s *Splice) Iterate() *Iterator {
 	return &Iterator{
 		splice:    s,
@@ -397,4 +405,17 @@ func (s *Iterator) Get() (int, byte, error) {
 	}
 	s.nextIndex = s.nextIndex + 1
 	return resultIndex, result, nil
+}
+
+func (s *Iterator) GetUnsafeWithIndex() (int, byte) {
+	resultIndex := s.nextIndex
+	result := s.splice.GetUnsafe(s.nextIndex)
+	s.nextIndex = s.nextIndex + 1
+	return resultIndex, result
+}
+
+func (s *Iterator) GetUnsafe() byte {
+	result := s.splice.GetUnsafe(s.nextIndex)
+	s.nextIndex = s.nextIndex + 1
+	return result
 }
