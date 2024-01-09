@@ -385,8 +385,8 @@ type Iterator struct {
 	nextIndex int
 }
 
-func (s *Iterator) Next() (int, bool) {
-	return s.nextIndex, s.nextIndex < s.splice.len
+func (s *Iterator) Next() bool {
+	return s.nextIndex < s.splice.Length()
 }
 
 func (s *Iterator) Get() (int, byte, error) {

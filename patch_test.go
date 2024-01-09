@@ -476,7 +476,7 @@ func TestIteration(t *testing.T) {
 	it := splice.Iterate()
 
 	for _, c := range expected {
-		if _, ok := it.Next(); ok {
+		if it.Next() {
 			_, value, err := it.Get()
 			if err != nil {
 				t.Fail()
@@ -489,7 +489,7 @@ func TestIteration(t *testing.T) {
 		}
 	}
 
-	if _, ok := it.Next(); ok {
+	if it.Next() {
 		t.Fail()
 	}
 }
