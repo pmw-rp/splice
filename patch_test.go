@@ -12,8 +12,8 @@ func ptr(data []byte) *[]byte {
 func TestReindex(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foo")), ptr([]byte("bar"))}
 	splice := Splice{
-		slices: slices,
-		len:    6,
+		Slices: slices,
+		Len:    6,
 	}
 
 	//_, d := splice.getPosition(-1)
@@ -60,8 +60,8 @@ func TestReindex(t *testing.T) {
 func TestCompact(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foo")), ptr([]byte("bar"))}
 	splice := Splice{
-		slices: slices,
-		len:    6,
+		Slices: slices,
+		Len:    6,
 	}
 	compacted := splice.Compact()
 	expected := []byte("foobar")
@@ -73,8 +73,8 @@ func TestCompact(t *testing.T) {
 func TestAppend(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foo"))}
 	splice := Splice{
-		slices: slices,
-		len:    3,
+		Slices: slices,
+		Len:    3,
 	}
 	appendage := ptr([]byte("bar"))
 	err := splice.Append(appendage)
@@ -91,8 +91,8 @@ func TestAppend(t *testing.T) {
 func TestInsertAsAppend(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foo"))}
 	splice := Splice{
-		slices: slices,
-		len:    3,
+		Slices: slices,
+		Len:    3,
 	}
 	appendage := ptr([]byte("bar"))
 	err := splice.Insert(appendage, 3)
@@ -109,8 +109,8 @@ func TestInsertAsAppend(t *testing.T) {
 func TestPrepend(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("bar"))}
 	splice := Splice{
-		slices: slices,
-		len:    3,
+		Slices: slices,
+		Len:    3,
 	}
 	item := ptr([]byte("foo"))
 	err := splice.Prepend(item)
@@ -127,8 +127,8 @@ func TestPrepend(t *testing.T) {
 func TestInsertAsPrepend(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("bar"))}
 	splice := Splice{
-		slices: slices,
-		len:    3,
+		Slices: slices,
+		Len:    3,
 	}
 	item := ptr([]byte("foo"))
 	err := splice.Insert(item, 0)
@@ -145,8 +145,8 @@ func TestInsertAsPrepend(t *testing.T) {
 func TestInsertSplit(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("abcghi"))}
 	splice := Splice{
-		slices: slices,
-		len:    6,
+		Slices: slices,
+		Len:    6,
 	}
 
 	// Pre Insertion Checks
@@ -182,8 +182,8 @@ func TestInsertSplit(t *testing.T) {
 func TestInsertBetween(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("abc")), ptr([]byte("ghi"))}
 	splice := Splice{
-		slices: slices,
-		len:    6,
+		Slices: slices,
+		Len:    6,
 	}
 
 	// Pre Insertion Checks
@@ -219,8 +219,8 @@ func TestInsertBetween(t *testing.T) {
 func TestDeleteFirstSlice(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foo")), ptr([]byte("bar"))}
 	splice := Splice{
-		slices: slices,
-		len:    6,
+		Slices: slices,
+		Len:    6,
 	}
 	err := splice.Delete(3, 3)
 	if err != nil {
@@ -232,7 +232,7 @@ func TestDeleteFirstSlice(t *testing.T) {
 	if !bytes.Equal(compacted, expected) {
 		t.Fail()
 	}
-	if splice.len != 3 {
+	if splice.Len != 3 {
 		t.Fail()
 	}
 }
@@ -240,8 +240,8 @@ func TestDeleteFirstSlice(t *testing.T) {
 func TestDeleteMiddle(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foobarbaz"))}
 	splice := Splice{
-		slices: slices,
-		len:    9,
+		Slices: slices,
+		Len:    9,
 	}
 	err := splice.Delete(3, 3)
 	if err != nil {
@@ -252,7 +252,7 @@ func TestDeleteMiddle(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if splice.len != 6 {
+	if splice.Len != 6 {
 		t.Fail()
 	}
 	compacted := splice.Compact()
@@ -265,8 +265,8 @@ func TestDeleteMiddle(t *testing.T) {
 func TestDeleteMiddleSlice(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foo")), ptr([]byte("bar")), ptr([]byte("baz"))}
 	splice := Splice{
-		slices: slices,
-		len:    9,
+		Slices: slices,
+		Len:    9,
 	}
 	err := splice.Delete(3, 3)
 	if err != nil {
@@ -278,7 +278,7 @@ func TestDeleteMiddleSlice(t *testing.T) {
 	if !bytes.Equal(compacted, expected) {
 		t.Fail()
 	}
-	if splice.len != 6 {
+	if splice.Len != 6 {
 		t.Fail()
 	}
 	if splice.CountSlices() != 2 {
@@ -365,8 +365,8 @@ func TestRightOverlap(t *testing.T) {
 func TestHead(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foobarbaz"))}
 	splice := Splice{
-		slices: slices,
-		len:    9,
+		Slices: slices,
+		Len:    9,
 	}
 	head, err := splice.Head(6)
 	if err != nil {
@@ -378,7 +378,7 @@ func TestHead(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if splice.len != 9 {
+	if splice.Len != 9 {
 		t.Fail()
 	}
 
@@ -386,7 +386,7 @@ func TestHead(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if head.len != 6 {
+	if head.Len != 6 {
 		t.Fail()
 	}
 
@@ -400,8 +400,8 @@ func TestHead(t *testing.T) {
 func TestTail(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foobarbaz"))}
 	splice := Splice{
-		slices: slices,
-		len:    9,
+		Slices: slices,
+		Len:    9,
 	}
 	tail, err := splice.Tail(6)
 	if err != nil {
@@ -413,7 +413,7 @@ func TestTail(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if splice.len != 9 {
+	if splice.Len != 9 {
 		t.Fail()
 	}
 
@@ -421,7 +421,7 @@ func TestTail(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if tail.len != 6 {
+	if tail.Len != 6 {
 		t.Fail()
 	}
 
@@ -435,8 +435,8 @@ func TestTail(t *testing.T) {
 func TestMiddle(t *testing.T) {
 	slices := []*[]byte{ptr([]byte("foobarbaz"))}
 	splice := Splice{
-		slices: slices,
-		len:    9,
+		Slices: slices,
+		Len:    9,
 	}
 	middle, err := splice.Middle(2, 6)
 	if err != nil {
@@ -447,7 +447,7 @@ func TestMiddle(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if splice.len != 9 {
+	if splice.Len != 9 {
 		t.Fail()
 	}
 
@@ -455,7 +455,7 @@ func TestMiddle(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if middle.len != 6 {
+	if middle.Len != 6 {
 		t.Fail()
 	}
 
@@ -470,8 +470,8 @@ func TestIteration(t *testing.T) {
 	expected := "foobarbaz"
 	slices := []*[]byte{ptr([]byte("foo")), ptr([]byte("bar")), ptr([]byte("baz"))}
 	splice := Splice{
-		slices: slices,
-		len:    9,
+		Slices: slices,
+		Len:    9,
 	}
 	it := splice.Iterate()
 

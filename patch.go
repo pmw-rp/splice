@@ -6,12 +6,12 @@ import (
 )
 
 type Splice struct {
-	slices []*[]byte
-	len    int
+	Slices []*[]byte
+	Len    int
 }
 
 func NewSplice(data []byte) *Splice {
-	return &Splice{slices: []*[]byte{&data}, len: len(data)}
+	return &Splice{Slices: []*[]byte{&data}, Len: len(data)}
 }
 
 type InsertType int
@@ -31,7 +31,7 @@ func (s *Splice) getPosition(index int) (position Position, err error) {
 	currentPosition := 0
 	currentSlice := 0
 
-	for _, slice := range s.slices {
+	for _, slice := range s.Slices {
 		nextSlice := currentPosition + len(*slice)
 		if index < nextSlice {
 			return Position{currentSlice, index - currentPosition}, nil
@@ -64,14 +64,14 @@ func (s *Splice) getInsertType(position Position) InsertType {
 func (s *Splice) Prepend(data *[]byte) error {
 	var result []*[]byte
 	result = append(result, data)
-	result = append(result, s.slices...)
-	s.slices = result
-	s.len = s.len + len(*data)
+	result = append(result, s.Slices...)
+	s.Slices = result
+	s.Len = s.Len + len(*data)
 	return nil
 }
 
 func (s *Splice) Insert(data *[]byte, position int) error {
-	if position == s.len {
+	if position == s.Len {
 		// The position indicates append, so don't calculate the index (which would be illegal), just do it
 		err := s.Append(data)
 		if err != nil {
@@ -90,29 +90,29 @@ func (s *Splice) Insert(data *[]byte, position int) error {
 		}
 		switch s.getInsertType(position) {
 		case Between:
-			pre := s.slices[0:position.slice]
-			post := s.slices[position.slice:len(s.slices)]
+			pre := s.Slices[0:position.slice]
+			post := s.Slices[position.slice:len(s.Slices)]
 			var result []*[]byte
 			result = append(result, pre...)
 			result = append(result, data)
 			result = append(result, post...)
-			s.len = s.len + len(*data)
-			s.slices = result
+			s.Len = s.Len + len(*data)
+			s.Slices = result
 		case Split:
-			pre := s.slices[0:position.slice]
+			pre := s.Slices[0:position.slice]
 			var splits []*[]byte
-			before := (*s.slices[position.slice])[0:position.offset]
-			after := (*s.slices[position.slice])[position.offset:len(*s.slices[position.slice])]
+			before := (*s.Slices[position.slice])[0:position.offset]
+			after := (*s.Slices[position.slice])[position.offset:len(*s.Slices[position.slice])]
 			splits = append(splits, &before)
 			splits = append(splits, data)
 			splits = append(splits, &after)
-			post := s.slices[position.slice+1 : len(s.slices)]
+			post := s.Slices[position.slice+1 : len(s.Slices)]
 			var result []*[]byte
 			result = append(result, pre...)
 			result = append(result, splits...)
 			result = append(result, post...)
-			s.len = s.len + len(*data)
-			s.slices = result
+			s.Len = s.Len + len(*data)
+			s.Slices = result
 		}
 	}
 	return nil
@@ -120,10 +120,10 @@ func (s *Splice) Insert(data *[]byte, position int) error {
 
 func (s *Splice) Append(data *[]byte) error {
 	var result []*[]byte
-	result = append(result, s.slices...)
+	result = append(result, s.Slices...)
 	result = append(result, data)
-	s.slices = result
-	s.len = s.len + len(*data)
+	s.Slices = result
+	s.Len = s.Len + len(*data)
 	return nil
 }
 
@@ -204,7 +204,7 @@ func overlap(a Region, b Region) (Region, bool) {
 }
 
 func (s *Splice) getSliceRegion(sliceIndex int) (Region, error) {
-	maxSliceIndex := len(s.slices) - 1
+	maxSliceIndex := len(s.Slices) - 1
 	if sliceIndex < 0 || sliceIndex > maxSliceIndex {
 		return Region{}, errors.New("oops")
 	}
@@ -248,7 +248,7 @@ func (s *Splice) getAction(slice int, deletion Region) (SliceAction, int, int) {
 }
 
 func (s *Splice) Delete(index int, length int) error {
-	if index < 0 || index+length > s.len {
+	if index < 0 || index+length > s.Len {
 		return errors.New(fmt.Sprintf("illegal index and/or length: %d", index))
 	}
 	deletionStart, err := s.getPosition(index)
@@ -264,27 +264,27 @@ func (s *Splice) Delete(index int, length int) error {
 
 	bytesDeleted := 0
 	var result []*[]byte
-	for i := range s.slices {
+	for i := range s.Slices {
 		action, lower, upper := s.getAction(i, deletionRegion)
 		if action == Keep {
-			result = append(result, s.slices[i])
+			result = append(result, s.Slices[i])
 		}
 		if action == KeepHead {
-			slice := *s.slices[i]
+			slice := *s.Slices[i]
 			var head []byte
 			head = append(head, slice[0:lower]...)
 			result = append(result, &head)
 			bytesDeleted = bytesDeleted + (len(slice) - lower)
 		}
 		if action == KeepTail {
-			slice := *s.slices[i]
+			slice := *s.Slices[i]
 			var tail []byte
 			tail = append(slice[upper:], tail...)
 			result = append(result, &tail)
 			bytesDeleted = bytesDeleted + upper
 		}
 		if action == DropMiddle {
-			slice := *s.slices[i]
+			slice := *s.Slices[i]
 			var head []byte
 			head = append(head, slice[0:lower]...)
 			var tail []byte
@@ -294,31 +294,31 @@ func (s *Splice) Delete(index int, length int) error {
 			bytesDeleted = bytesDeleted + (upper - lower)
 		}
 		if action == Drop {
-			slice := *s.slices[i]
+			slice := *s.Slices[i]
 			bytesDeleted = bytesDeleted + len(slice)
 		}
 	}
-	s.slices = result
-	s.len = s.len - bytesDeleted
+	s.Slices = result
+	s.Len = s.Len - bytesDeleted
 	return nil
 }
 
 func (s *Splice) clone() *Splice {
 	result := Splice{
-		slices: make([]*[]byte, len(s.slices)),
-		len:    s.len,
+		Slices: make([]*[]byte, len(s.Slices)),
+		Len:    s.Len,
 	}
-	for i, slice := range s.slices {
+	for i, slice := range s.Slices {
 		clonedSlice := make([]byte, len(*slice))
 		copy(clonedSlice, *slice)
-		result.slices[i] = &clonedSlice
+		result.Slices[i] = &clonedSlice
 	}
 	return &result
 }
 
 func (s *Splice) Head(index int) (*Splice, error) {
 	result := s.clone()
-	err := result.Delete(index, s.len-index)
+	err := result.Delete(index, s.Len-index)
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +335,7 @@ func (s *Splice) HeadUnsafe(index int) *Splice {
 
 func (s *Splice) Tail(index int) (*Splice, error) {
 	result := s.clone()
-	err := result.Delete(0, s.len-index)
+	err := result.Delete(0, s.Len-index)
 	if err != nil {
 		return nil, err
 	}
@@ -372,9 +372,9 @@ func (s *Splice) MiddleUnsafe(index int, length int) *Splice {
 }
 
 func (s *Splice) Compact() []byte {
-	value := make([]byte, s.len)
+	value := make([]byte, s.Len)
 	p := 0
-	for _, slice := range s.slices {
+	for _, slice := range s.Slices {
 		copy(value[p:p+len(*slice)], *slice)
 		p = p + len(*slice)
 	}
@@ -382,11 +382,11 @@ func (s *Splice) Compact() []byte {
 }
 
 func (s *Splice) Length() int {
-	return s.len
+	return s.Len
 }
 
 func (s *Splice) CountSlices() int {
-	return len(s.slices)
+	return len(s.Slices)
 }
 
 func (s *Splice) Get(index int) (byte, error) {
@@ -394,7 +394,7 @@ func (s *Splice) Get(index int) (byte, error) {
 	if err != nil {
 		return 0, err
 	}
-	return (*s.slices[position.slice])[position.offset], nil
+	return (*s.Slices[position.slice])[position.offset], nil
 }
 
 func (s *Splice) GetUnsafe(index int) byte {
@@ -402,7 +402,7 @@ func (s *Splice) GetUnsafe(index int) byte {
 	if err != nil {
 		panic(1)
 	}
-	return (*s.slices[position.slice])[position.offset]
+	return (*s.Slices[position.slice])[position.offset]
 }
 
 func (s *Splice) Iterate() *Iterator {
