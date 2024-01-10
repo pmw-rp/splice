@@ -501,3 +501,13 @@ func TestEqual(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestIndexByte(t *testing.T) {
+	a := Splice{Slices: []*[]byte{ptr([]byte("foobarbaz"))}, Len: 9}
+	if IndexByte(&a, 'o') != 1 {
+		t.Fail()
+	}
+	if IndexByte(&a, 'i') != -1 {
+		t.Fail()
+	}
+}

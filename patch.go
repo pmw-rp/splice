@@ -456,3 +456,14 @@ func (s *Iterator) GetUnsafe() byte {
 	s.nextIndex = s.nextIndex + 1
 	return result
 }
+
+// IndexByte returns the index of the first instance of c in b, or -1 if c is not present in b.
+func IndexByte(data *Splice, c byte) int {
+	for it := data.Iterate(); it.Next(); {
+		i, cc := it.GetUnsafeWithIndex()
+		if cc == c {
+			return i
+		}
+	}
+	return -1
+}
