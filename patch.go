@@ -14,6 +14,19 @@ func NewSplice(data []byte) *Splice {
 	return &Splice{Slices: []*[]byte{&data}, Len: len(data)}
 }
 
+func Equal(a *Splice, b *Splice) bool {
+	if a.Length() != b.Length() {
+		return false
+	}
+	for it := a.Iterate(); it.Next(); {
+		i, c := it.GetUnsafeWithIndex()
+		if c != b.GetUnsafe(i) {
+			return false
+		}
+	}
+	return true
+}
+
 type InsertType int
 
 const (

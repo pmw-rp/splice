@@ -493,3 +493,11 @@ func TestIteration(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestEqual(t *testing.T) {
+	a := Splice{Slices: []*[]byte{ptr([]byte("foobarbaz"))}, Len: 9}
+	b := Splice{Slices: []*[]byte{ptr([]byte("foo")), ptr([]byte("bar")), ptr([]byte("baz"))}, Len: 9}
+	if !Equal(&a, &b) {
+		t.Fail()
+	}
+}
