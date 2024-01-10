@@ -325,6 +325,14 @@ func (s *Splice) Head(index int) (*Splice, error) {
 	return result, nil
 }
 
+func (s *Splice) HeadUnsafe(index int) *Splice {
+	result, err := s.Head(index)
+	if err != nil {
+		panic(1)
+	}
+	return result
+}
+
 func (s *Splice) Tail(index int) (*Splice, error) {
 	result := s.clone()
 	err := result.Delete(0, s.len-index)
@@ -332,6 +340,14 @@ func (s *Splice) Tail(index int) (*Splice, error) {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *Splice) TailUnsafe(index int) *Splice {
+	result, err := s.Tail(index)
+	if err != nil {
+		panic(1)
+	}
+	return result
 }
 
 func (s *Splice) Middle(index int, length int) (*Splice, error) {
@@ -345,6 +361,14 @@ func (s *Splice) Middle(index int, length int) (*Splice, error) {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *Splice) MiddleUnsafe(index int, length int) *Splice {
+	result, err := s.Middle(index, length)
+	if err != nil {
+		panic(1)
+	}
+	return result
 }
 
 func (s *Splice) Compact() []byte {
