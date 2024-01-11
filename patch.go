@@ -348,7 +348,7 @@ func (s *Splice) HeadUnsafe(index int) *Splice {
 
 func (s *Splice) Tail(index int) (*Splice, error) {
 	result := s.clone()
-	err := result.Delete(0, s.Len-index)
+	err := result.Delete(0, index)
 	if err != nil {
 		return nil, err
 	}
@@ -363,13 +363,13 @@ func (s *Splice) TailUnsafe(index int) *Splice {
 	return result
 }
 
-func (s *Splice) Middle(index int, length int) (*Splice, error) {
+func (s *Splice) Middle(a int, b int) (*Splice, error) {
 	result := s.clone()
-	err := result.Delete(0, index)
+	err := result.Delete(b, result.Length()-b)
 	if err != nil {
 		return nil, err
 	}
-	err = result.Delete(length, result.Length()-length)
+	err = result.Delete(0, a)
 	if err != nil {
 		return nil, err
 	}

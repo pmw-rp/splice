@@ -421,12 +421,12 @@ func TestTail(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if tail.Len != 6 {
+	if tail.Len != 3 {
 		t.Fail()
 	}
 
 	compacted := tail.Compact()
-	expected := []byte("barbaz")
+	expected := []byte("baz")
 	if !bytes.Equal(compacted, expected) {
 		t.Fail()
 	}
@@ -438,11 +438,7 @@ func TestMiddle(t *testing.T) {
 		Slices: slices,
 		Len:    9,
 	}
-	middle, err := splice.Middle(2, 6)
-	if err != nil {
-		t.Fail()
-		return
-	}
+
 	if splice.CountSlices() != 1 {
 		t.Fail()
 		return
@@ -451,16 +447,21 @@ func TestMiddle(t *testing.T) {
 		t.Fail()
 	}
 
+	middle, err := splice.Middle(2, 6)
+	if err != nil {
+		t.Fail()
+		return
+	}
 	if middle.CountSlices() != 1 {
 		t.Fail()
 		return
 	}
-	if middle.Len != 6 {
+	if middle.Len != 4 {
 		t.Fail()
 	}
 
 	compacted := middle.Compact()
-	expected := []byte("obarba")
+	expected := []byte("obar")
 	if !bytes.Equal(compacted, expected) {
 		t.Fail()
 	}
