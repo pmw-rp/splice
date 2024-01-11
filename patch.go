@@ -330,6 +330,12 @@ func (s *Splice) clone() *Splice {
 }
 
 func (s *Splice) Head(index int) (*Splice, error) {
+	if s.Len == 0 && index == 0 {
+		return &Splice{
+			Slices: nil,
+			Len:    0,
+		}, nil
+	}
 	result := s.clone()
 	err := result.Delete(index, s.Len-index)
 	if err != nil {
@@ -370,6 +376,12 @@ func (s *Splice) TailUnsafe(index int) *Splice {
 }
 
 func (s *Splice) Middle(a int, b int) (*Splice, error) {
+	if a == 0 && b == 0 {
+		return &Splice{
+			Slices: nil,
+			Len:    0,
+		}, nil
+	}
 	result := s.clone()
 	err := result.Delete(b, result.Length()-b)
 	if err != nil {
